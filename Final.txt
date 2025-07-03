@@ -1,0 +1,333 @@
+drop database if exists travel_rock;
+create database travel_rock;
+use travel_rock;
+-- Tabla: Colegios
+CREATE TABLE Colegios (
+    ID_Colegio INT PRIMARY KEY,
+    Nombre_Colegio VARCHAR(100),
+    Ciudad VARCHAR(50),
+    Contacto VARCHAR(100)
+);
+
+-- Tabla: Estudiantes
+CREATE TABLE Estudiantes (
+    ID_Estudiante INT PRIMARY KEY,
+    Nombre VARCHAR(100),
+    RUT VARCHAR(15),
+    ID_Colegio INT,
+    FOREIGN KEY (ID_Colegio) REFERENCES Colegios(ID_Colegio)
+);
+
+-- Tabla: Coordinadores
+CREATE TABLE Coordinadores (
+    ID_Coordinador INT PRIMARY KEY,
+    Nombre VARCHAR(100),
+    Telefono VARCHAR(20),
+    Disponibilidad VARCHAR(20)
+);
+
+-- Tabla: Viajes
+CREATE TABLE Viajes (
+    ID_Viaje INT PRIMARY KEY,
+    Destino VARCHAR(100),
+    Fecha_Salida DATE,
+    Fecha_Retorno DATE,
+    ID_Colegio INT,
+    ID_Coordinador INT,
+    FOREIGN KEY (ID_Colegio) REFERENCES Colegios(ID_Colegio),
+    FOREIGN KEY (ID_Coordinador) REFERENCES Coordinadores(ID_Coordinador)
+);
+
+-- Tabla: Reservas
+CREATE TABLE Reservas (
+    ID_Reserva INT PRIMARY KEY,
+    ID_Estudiante INT,
+    ID_Viaje INT,
+    Estado VARCHAR(20),
+    FOREIGN KEY (ID_Estudiante) REFERENCES Estudiantes(ID_Estudiante),
+    FOREIGN KEY (ID_Viaje) REFERENCES Viajes(ID_Viaje)
+);
+
+-- Tabla: Contratos
+CREATE TABLE Contratos (
+    ID_Contrato INT PRIMARY KEY,
+    ID_Reserva INT,
+    Fecha_Contrato DATE,
+    Observaciones TEXT,
+    FOREIGN KEY (ID_Reserva) REFERENCES Reservas(ID_Reserva)
+);
+
+-- Tabla: Pagos
+CREATE TABLE Pagos (
+    ID_Pago INT PRIMARY KEY,
+    ID_Reserva INT,
+    Monto DECIMAL(10, 2),
+    Fecha_Pago DATE,
+    Metodo VARCHAR(50),
+    FOREIGN KEY (ID_Reserva) REFERENCES Reservas(ID_Reserva)
+);
+
+-- Tabla: Seguros
+CREATE TABLE Seguros (
+    ID_Seguro INT PRIMARY KEY,
+    ID_Estudiante INT,
+    Proveedor VARCHAR(100),
+    Cobertura VARCHAR(50),
+    FOREIGN KEY (ID_Estudiante) REFERENCES Estudiantes(ID_Estudiante)
+);
+
+-- Tabla: Vuelos
+CREATE TABLE Vuelos (
+    ID_Vuelo INT PRIMARY KEY,
+    ID_Viaje INT,
+    Aerolinea VARCHAR(100),
+    Numero_Vuelo VARCHAR(20),
+    FOREIGN KEY (ID_Viaje) REFERENCES Viajes(ID_Viaje)
+);
+
+CREATE TABLE IF NOT EXISTS ErroresPorDia (
+    Fecha DATE NOT NULL,
+    Cantidad INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (Fecha)
+);
+
+-- Insertar datos de ejemplo en la tabla Colegios
+INSERT INTO Colegios (ID_Colegio, Nombre_Colegio, Ciudad, Contacto) VALUES
+(1, 'Liceo Bicentenario de Excelencia', 'Santiago', 'contacto@liceobicentenario.cl'),
+(2, 'Colegio San Ignacio', 'Providencia', 'info@sanignacio.cl'),
+(3, 'Instituto Nacional General José Miguel Carrera', 'Santiago', 'secretaria@institutonacional.cl');
+
+-- Insertar datos de ejemplo en la tabla Estudiantes (40 estudiantes distribuidos en 3 colegios)
+-- Colegio 1: Liceo Bicentenario (14 estudiantes)
+INSERT INTO Estudiantes (ID_Estudiante, Nombre, RUT, ID_Colegio) VALUES
+(1, 'Ana María Pérez Soto', '12.345.678-9', 1),
+(2, 'Benjamín Andrés Rojas Díaz', '13.456.789-0', 1),
+(3, 'Carla Fernanda Gómez Vega', '14.567.890-1', 1),
+(4, 'Diego Alonso Torres Salas', '15.678.901-2', 1),
+(5, 'Elena Sofía Castro Fuentes', '16.789.012-3', 1),
+(6, 'Felipe Ignacio Morales Vera', '17.890.123-4', 1),
+(7, 'Gabriela Alejandra Núñez Bravo', '18.901.234-5', 1),
+(8, 'Hugo Sebastián Ortiz Lagos', '19.012.345-6', 1),
+(9, 'Isidora Constanza Reyes Soto', '20.123.456-7', 1),
+(10, 'Javier Antonio Silva Pérez', '21.234.567-8', 1),
+(11, 'Karen Daniela Vargas Muñoz', '22.345.678-9', 1),
+(12, 'Luis Fernando Herrera Flores', '23.456.789-0', 1),
+(13, 'Martina Belén Guzmán Rojas', '24.567.890-1', 1),
+(14, 'Nicolás Esteban Peña Díaz', '25.678.901-2', 1);
+
+-- Colegio 2: Colegio San Ignacio (13 estudiantes)
+INSERT INTO Estudiantes (ID_Estudiante, Nombre, RUT, ID_Colegio) VALUES
+(15, 'Olivia Paz Soto Vega', '26.789.012-3', 2),
+(16, 'Pedro Pablo Contreras Salas', '27.890.123-4', 2),
+(17, 'Queralt Antonia Fuentes Vera', '28.901.234-5', 2),
+(18, 'Ricardo José Muñoz Bravo', '29.012.345-6', 2),
+(19, 'Sofía Javiera Lagos Rojas', '30.123.456-7', 2),
+(20, 'Tomás Eduardo Pérez Flores', '31.234.567-8', 2),
+(21, 'Ursula Victoria Díaz Muñoz', '32.345.678-9', 2),
+(22, 'Valentina Isidora Vera Soto', '33.456.789-0', 2),
+(23, 'Walter Ariel Bravo Salas', '34.567.890-1', 2),
+(24, 'Ximena Andrea Rojas Flores', '35.678.901-2', 2),
+(25, 'Yago Sebastián Salas Vera', '36.789.012-3', 2),
+(26, 'Zoe Constanza Flores Bravo', '37.890.123-4', 2),
+(27, 'Amanda Carolina Soto Díaz', '38.901.234-5', 2);
+
+-- Colegio 3: Instituto Nacional (13 estudiantes)
+INSERT INTO Estudiantes (ID_Estudiante, Nombre, RUT, ID_Colegio) VALUES
+(28, 'Bastián Alejandro Vega Salas', '39.012.345-6', 3),
+(29, 'Catalina Ignacia Bravo Flores', '40.123.456-7', 3),
+(30, 'Daniela Fernanda Díaz Vera', '41.234.567-8', 3),
+(31, 'Emilio José Muñoz Soto', '42.345.678-9', 3),
+(32, 'Florencia Antonia Rojas Bravo', '43.456.789-0', 3),
+(33, 'Gonzalo Esteban Salas Díaz', '44.567.890-1', 3),
+(34, 'Helena Sofía Vera Flores', '45.678.901-2', 3),
+(35, 'Ignacio Felipe Bravo Soto', '46.789.012-3', 3),
+(36, 'Josefa Isidora Díaz Rojas', '47.890.123-4', 3),
+(37, 'Kevin Sebastián Flores Vera', '48.901.234-5', 3),
+(38, 'Laura Andrea Soto Bravo', '49.012.345-6', 3),
+(39, 'Maximiliano Javier Vera Díaz', '50.123.456-7', 3),
+(40, 'Natalia Paz Bravo Flores', '51.234.567-8', 3);
+
+-- Insertar datos de ejemplo en la tabla Coordinadores
+INSERT INTO Coordinadores (ID_Coordinador, Nombre, Telefono, Disponibilidad) VALUES
+(1, 'Juan Pablo Guzmán', '+56912345678', 'Completa'),
+(2, 'María Fernanda Salas', '+56987654321', 'Parcial'),
+(3, 'Roberto Carlos Fuentes', '+56911223344', 'Completa');
+
+-- Insertar datos de ejemplo en la tabla Viajes
+INSERT INTO Viajes (ID_Viaje, Destino, Fecha_Salida, Fecha_Retorno, ID_Colegio, ID_Coordinador) VALUES
+(1, 'Bariloche, Argentina', '2025-07-15', '2025-07-25', 1, 1),
+(2, 'Punta Cana, República Dominicana', '2025-08-01', '2025-08-10', 2, 2),
+(3, 'Cancún, México', '2025-09-05', '2025-09-15', 3, 3),
+(4, 'Bariloche, Argentina', '2025-10-01', '2025-10-10', 1, 1);
+
+-- Insertar datos de ejemplo en la tabla Reservas
+INSERT INTO Reservas (ID_Reserva, ID_Estudiante, ID_Viaje, Estado) VALUES
+(1, 1, 1, 'Confirmada'),
+(2, 2, 1, 'Confirmada'),
+(3, 3, 1, 'Confirmada'),
+(4, 4, 1, 'Pendiente'),
+(5, 15, 2, 'Confirmada'),
+(6, 16, 2, 'Confirmada'),
+(7, 28, 3, 'Confirmada'),
+(8, 29, 3, 'Pendiente'),
+(9, 5, 1, 'Confirmada'),
+(10, 6, 1, 'Confirmada'),
+(11, 7, 1, 'Confirmada'),
+(12, 8, 1, 'Confirmada'),
+(13, 9, 1, 'Confirmada'),
+(14, 10, 1, 'Confirmada'),
+(15, 11, 1, 'Confirmada'),
+(16, 12, 1, 'Confirmada'),
+(17, 13, 1, 'Confirmada'),
+(18, 14, 1, 'Confirmada'),
+(19, 17, 2, 'Confirmada'),
+(20, 18, 2, 'Confirmada'),
+(21, 19, 2, 'Confirmada'),
+(22, 20, 2, 'Confirmada'),
+(23, 21, 2, 'Confirmada'),
+(24, 22, 2, 'Confirmada'),
+(25, 23, 2, 'Confirmada'),
+(26, 24, 2, 'Confirmada'),
+(27, 25, 2, 'Confirmada'),
+(28, 26, 2, 'Confirmada'),
+(29, 27, 2, 'Confirmada'),
+(30, 30, 3, 'Confirmada'),
+(31, 31, 3, 'Confirmada'),
+(32, 32, 3, 'Confirmada'),
+(33, 33, 3, 'Confirmada'),
+(34, 34, 3, 'Confirmada'),
+(35, 35, 3, 'Confirmada'),
+(36, 36, 3, 'Confirmada'),
+(37, 37, 3, 'Confirmada'),
+(38, 38, 3, 'Confirmada'),
+(39, 39, 3, 'Confirmada'),
+(40, 40, 3, 'Confirmada');
+
+
+-- Insertar datos de ejemplo en la tabla Contratos
+INSERT INTO Contratos (ID_Contrato, ID_Reserva, Fecha_Contrato, Observaciones) VALUES
+(1, 1, '2024-03-10', 'Contrato inicial firmado.'),
+(2, 2, '2024-03-11', 'Contrato inicial firmado.'),
+(3, 5, '2024-04-01', 'Contrato inicial firmado.'),
+(4, 7, '2024-05-01', 'Contrato inicial firmado.'),
+(5, 9, '2024-03-10', 'Contrato inicial firmado.'),
+(6, 10, '2024-03-10', 'Contrato inicial firmado.'),
+(7, 11, '2024-03-10', 'Contrato inicial firmado.'),
+(8, 12, '2024-03-10', 'Contrato inicial firmado.'),
+(9, 13, '2024-03-10', 'Contrato inicial firmado.'),
+(10, 14, '2024-03-10', 'Contrato inicial firmado.'),
+(11, 15, '2024-03-10', 'Contrato inicial firmado.'),
+(12, 16, '2024-03-10', 'Contrato inicial firmado.'),
+(13, 17, '2024-03-10', 'Contrato inicial firmado.'),
+(14, 18, '2024-03-10', 'Contrato inicial firmado.'),
+(15, 19, '2024-04-01', 'Contrato inicial firmado.'),
+(16, 20, '2024-04-01', 'Contrato inicial firmado.'),
+(17, 21, '2024-04-01', 'Contrato inicial firmado.'),
+(18, 22, '2024-04-01', 'Contrato inicial firmado.'),
+(19, 23, '2024-04-01', 'Contrato inicial firmado.'),
+(20, 24, '2024-04-01', 'Contrato inicial firmado.'),
+(21, 25, '2024-04-01', 'Contrato inicial firmado.'),
+(22, 26, '2024-04-01', 'Contrato inicial firmado.'),
+(23, 27, '2024-04-01', 'Contrato inicial firmado.'),
+(24, 28, '2024-04-01', 'Contrato inicial firmado.'),
+(25, 30, '2024-05-01', 'Contrato inicial firmado.'),
+(26, 31, '2024-05-01', 'Contrato inicial firmado.'),
+(27, 32, '2024-05-01', 'Contrato inicial firmado.'),
+(28, 33, '2024-05-01', 'Contrato inicial firmado.'),
+(29, 34, '2024-05-01', 'Contrato inicial firmado.'),
+(30, 35, '2024-05-01', 'Contrato inicial firmado.'),
+(31, 36, '2024-05-01', 'Contrato inicial firmado.'),
+(32, 37, '2024-05-01', 'Contrato inicial firmado.'),
+(33, 38, '2024-05-01', 'Contrato inicial firmado.'),
+(34, 39, '2024-05-01', 'Contrato inicial firmado.'),
+(35, 40, '2024-05-01', 'Contrato inicial firmado.');
+
+-- Insertar datos de ejemplo en la tabla Pagos
+INSERT INTO Pagos (ID_Pago, ID_Reserva, Monto, Fecha_Pago, Metodo) VALUES
+(1, 1, 500.00, '2024-03-15', 'Transferencia'),
+(2, 2, 500.00, '2024-03-16', 'Tarjeta de Crédito'),
+(3, 5, 750.00, '2024-04-05', 'Transferencia'),
+(4, 7, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(5, 1, 1500.00, '2024-06-01', 'Transferencia'),
+(6, 9, 500.00, '2024-03-15', 'Transferencia'),
+(7, 10, 500.00, '2024-03-15', 'Transferencia'),
+(8, 11, 500.00, '2024-03-15', 'Transferencia'),
+(9, 12, 500.00, '2024-03-15', 'Transferencia'),
+(10, 13, 500.00, '2024-03-15', 'Transferencia'),
+(11, 14, 500.00, '2024-03-15', 'Transferencia'),
+(12, 15, 750.00, '2024-04-05', 'Transferencia'),
+(13, 16, 750.00, '2024-04-05', 'Transferencia'),
+(14, 17, 750.00, '2024-04-05', 'Transferencia'),
+(15, 18, 750.00, '2024-04-05', 'Transferencia'),
+(16, 19, 750.00, '2024-04-05', 'Transferencia'),
+(17, 20, 750.00, '2024-04-05', 'Transferencia'),
+(18, 21, 750.00, '2024-04-05', 'Transferencia'),
+(19, 22, 750.00, '2024-04-05', 'Transferencia'),
+(20, 23, 750.00, '2024-04-05', 'Transferencia'),
+(21, 24, 750.00, '2024-04-05', 'Transferencia'),
+(22, 25, 750.00, '2024-04-05', 'Transferencia'),
+(23, 26, 750.00, '2024-04-05', 'Transferencia'),
+(24, 27, 750.00, '2024-04-05', 'Transferencia'),
+(25, 28, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(26, 30, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(27, 31, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(28, 32, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(29, 33, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(30, 34, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(31, 35, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(32, 36, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(33, 37, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(34, 38, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(35, 39, 1000.00, '2024-05-05', 'Tarjeta de Crédito'),
+(36, 40, 1000.00, '2024-05-05', 'Tarjeta de Crédito');
+
+-- Insertar datos de ejemplo en la tabla Seguros
+INSERT INTO Seguros (ID_Seguro, ID_Estudiante, Proveedor, Cobertura) VALUES
+(1, 1, 'Seguros Viaje Seguro', 'Completa'),
+(2, 2, 'Asistencia al Viajero Global', 'Básica'),
+(3, 3, 'Seguros Viaje Seguro', 'Completa'),
+(4, 5, 'Seguros Viaje Seguro', 'Completa'),
+(5, 6, 'Asistencia al Viajero Global', 'Básica'),
+(6, 7, 'Seguros Viaje Seguro', 'Completa'),
+(7, 8, 'Asistencia al Viajero Global', 'Básica'),
+(8, 9, 'Seguros Viaje Seguro', 'Completa'),
+(9, 10, 'Asistencia al Viajero Global', 'Básica'),
+(10, 11, 'Seguros Viaje Seguro', 'Completa'),
+(11, 12, 'Asistencia al Viajero Global', 'Básica'),
+(12, 13, 'Seguros Viaje Seguro', 'Completa'),
+(13, 14, 'Asistencia al Viajero Global', 'Básica'),
+(14, 15, 'Seguros Viaje Seguro', 'Completa'),
+(15, 16, 'Asistencia al Viajero Global', 'Básica'),
+(16, 17, 'Seguros Viaje Seguro', 'Completa'),
+(17, 18, 'Asistencia al Viajero Global', 'Básica'),
+(18, 19, 'Seguros Viaje Seguro', 'Completa'),
+(19, 20, 'Asistencia al Viajero Global', 'Básica'),
+(20, 21, 'Seguros Viaje Seguro', 'Completa'),
+(21, 22, 'Asistencia al Viajero Global', 'Básica'),
+(22, 23, 'Seguros Viaje Seguro', 'Completa'),
+(23, 24, 'Asistencia al Viajero Global', 'Básica'),
+(24, 25, 'Seguros Viaje Seguro', 'Completa'),
+(25, 26, 'Asistencia al Viajero Global', 'Básica'),
+(26, 27, 'Seguros Viaje Seguro', 'Completa'),
+(27, 28, 'Asistencia al Viajero Global', 'Básica'),
+(28, 29, 'Seguros Viaje Seguro', 'Completa'),
+(29, 30, 'Asistencia al Viajero Global', 'Básica'),
+(30, 31, 'Seguros Viaje Seguro', 'Completa'),
+(31, 32, 'Asistencia al Viajero Global', 'Básica'),
+(32, 33, 'Seguros Viaje Seguro', 'Completa'),
+(33, 34, 'Asistencia al Viajero Global', 'Básica'),
+(34, 35, 'Seguros Viaje Seguro', 'Completa'),
+(35, 36, 'Asistencia al Viajero Global', 'Básica'),
+(36, 37, 'Seguros Viaje Seguro', 'Completa'),
+(37, 38, 'Asistencia al Viajero Global', 'Básica'),
+(38, 39, 'Seguros Viaje Seguro', 'Completa'),
+(39, 40, 'Asistencia al Viajero Global', 'Básica');
+
+-- Insertar datos de ejemplo en la tabla Vuelos
+INSERT INTO Vuelos (ID_Vuelo, ID_Viaje, Aerolinea, Numero_Vuelo) VALUES
+(1, 1, 'LATAM Airlines', 'LA800'),
+(2, 1, 'LATAM Airlines', 'LA801'),
+(3, 2, 'Avianca', 'AV300'),
+(4, 2, 'Avianca', 'AV301'),
+(5, 3, 'Aeroméxico', 'AM500'),
+(6, 3, 'Aeroméxico', 'AM501');
